@@ -1,1 +1,1 @@
-import './index.scss'
+import '@/sass/main.sass'

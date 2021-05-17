@@ -1,4 +1,5 @@
 const path = require('path')
+const fs = require('fs')
 const { CleanWebpackPlugin } = require('clean-webpack-plugin')
 const HtmlWebpackPlugin = require('html-webpack-plugin')
 // const CopyPlugin = require('copy-webpack-plugin')
@@ -27,6 +28,22 @@ const jsLoaders = () => {
   return loaders
 }
 
+let pugs = fs
+  .readdirSync('src/pug/')
+  .filter(file => path.extname(file) === '.pug')
+  .map(name => {
+    name = name.replace('.pug', '')
+    return new HtmlWebpackPlugin({
+      template: `./pug/${name}.pug`,
+      filename: `${name}.html`,
+      inject: true,
+      minify: {
+        removeComments: isProd,
+        collapseWhitespace: isProd
+      }
+    })
+  })
+
 module.exports = {
   context: path.resolve(__dirname, 'src'),
   mode: 'development',
@@ -48,15 +65,8 @@ module.exports = {
   target: 'web',
   devtool: isDev ? 'source-map' : false,
   plugins: [
+    ...pugs,
     new CleanWebpackPlugin(),
-    new HtmlWebpackPlugin({
-      template: './index.pug',
-      inject: true,
-      minify: {
-        removeComments: isProd,
-        collapseWhitespace: isProd
-      }
-    }),
     // new CopyPlugin({
     //   patterns: [
     //     {
